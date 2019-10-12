@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../location.dart';
+import 'package:http/http.dart' as http;
 
 class LoadingScreen extends StatefulWidget {
   @override
@@ -7,6 +8,12 @@ class LoadingScreen extends StatefulWidget {
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
+  @override
+  void initState() {
+    super.initState();
+    getLocation();
+  }
+
   void getLocation() async {
     Location location = Location();
     await location.getCurrentLocation();
@@ -14,27 +21,20 @@ class _LoadingScreenState extends State<LoadingScreen> {
     print('longitude: ${location.longitude}');
   }
 
-  @override
-  void initState() {
-    super.initState();
-    getLocation();
+  void getData() async {
+    http.Response response = await http.get(
+        'https://samples.openweathermap.org/data/2.5/weather?lat=35&lon=139&appid=b6907d289e10d714a6e88b30761fae22');
+    if (response.statusCode == 200) {
+      String data = response.body;
+      print(data);
+    } else {
+      print('ERROR: ${response.statusCode}');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    String myMargin = '15';
-    double myMarginAsADouble;
-
-    try {
-      myMarginAsADouble = double.parse(myMargin);
-    } catch (e) {
-      print(e);
-    }
-
-    return Scaffold(
-        body: Container(
-      margin: EdgeInsets.all(myMarginAsADouble ?? 30.0),
-      color: Colors.red,
-    ));
+    getData();
+    return Scaffold();
   }
 }
